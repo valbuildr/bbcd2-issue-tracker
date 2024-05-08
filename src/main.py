@@ -7,8 +7,6 @@ bot = commands.Bot(command_prefix="!", intents=discord.Intents.all())
 log = logging.getLogger('discord.bbcd2it')
 db = DatabaseFolder(folder="db", default_factory=lambda _: list())
 
-db['issues'] = dict()
-
 gh_auth = Auth.Token(config.github_personal_access_token)
 gh = Github(auth=gh_auth)
 
@@ -49,22 +47,34 @@ async def unban(ctx: commands.Context, user: discord.User):
 async def ping(interaction: commands.Context):
     await interaction.reply(content=f"My ping is {round(bot.latency * 1000)} ms!", ephemeral=True, mention_author=False)
 
-@bot.tree.command(name="create-issue", description="Create an issue.")
-async def create_issue(interaction: discord.Interaction, name: str, description: str):
-    await interaction.response.defer(ephemeral=True)
-    
-    title = name
-    description = f"> This is an automated report.\n> This was actually reported by {interaction.user.name} ({interaction.user.id}) on Discord.\n\n{description}"
+tags = {
+    'bug': 1237750431946379296,
+    'feature-request': 1237750443313201284,
+    'outage': 1237750469795905596
+}
 
-    repo = gh.get_repo(f"{config.github_repo}")
-    issue = repo.create_issue(title=title, body=description)
+@bot.event
+async def on_thread_create(thread: discord.Thread):
+    if thread.parent.id == 1237750129637855262 and bot.get_guild(1237748599606083605).get_channel(1237750129637855262).get_tag(1237750431946379296) in thread.applied_tags:
+        sm = await thread.fetch_message(thread.id)
 
-    embed = discord.Embed(title=f"Created issue #{issue.id}!")
-    embed.url = issue.url
-    embed.colour = discord.Colour.green()
+        ghrepo = gh.get_repo(f"{config.github_repo}")
+        issue = ghrepo.create_issue(
+            title=thread.name,
+            body=f"> This is an automated report.\n> This was actually reported by {sm.author.name} ({sm.author.name}) on Discord.\n\n{sm.content}"
+        )
 
-    db["issues"][issue.url] = {interaction.user.id}
-    
-    await interaction.followup.send(embed=embed)
+        embed = discord.Embed(title=f"Created issue #{issue.id}!")
+        embed.url = issue.html_url
+        embed.colour = discord.Colour.green()
+
+        aa = await thread.send(content=f"{issue.html_url}")
+        await aa.pin()
+
+@bot.event
+async def on_member_join(member: discord.Member):
+    if member.guild.id == 1237748599606083605:
+        await member.add_roles(discord.abc.Snowflake(1237749395206832159))
+
 
 bot.run(config.discord_token)
