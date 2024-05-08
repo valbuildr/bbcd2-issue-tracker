@@ -61,7 +61,7 @@ async def on_thread_create(thread: discord.Thread):
         ghrepo = gh.get_repo(f"{config.github_repo}")
         issue = ghrepo.create_issue(
             title=thread.name,
-            body=f"> This is an automated report.\n> This was actually reported by {sm.author.name} ({sm.author.name}) on Discord.\n\n{sm.content}"
+            body=f"> This is an automated report.\n> This was actually reported by {sm.author.name} ({sm.author.id}) on Discord.\n\n{sm.content}"
         )
 
         embed = discord.Embed(title=f"Created issue #{issue.id}!")
