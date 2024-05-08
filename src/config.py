@@ -1,3 +1,0 @@
-discord_token = "MTIzNzU2NzQ3NjQzNTUyMTUzOA.GOGZ2Y.ABXOKt1p6DaoJgPzY-F1CTcG58PZNanwkBqszc"
-github_personal_access_token = "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"
-github_repo = "valbuildr/bbdit-test"
