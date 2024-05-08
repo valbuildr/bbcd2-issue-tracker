@@ -1,4 +1,4 @@
-# bbcd-issue-tracker
+# bbcd2-issue-tracker
 
 a simple discord bot to track issues between github and discord
 
