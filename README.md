@@ -2,7 +2,7 @@
 
 a simple discord bot to track issues between github and discord
 
-made for use in dms/groups
+made for use in one server
 
 built with discord.py
 
